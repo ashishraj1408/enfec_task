@@ -13,6 +13,9 @@ export default function InterviewSummary() {
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(10);
   const [timeTaken, setTimeTaken] = useState(0);
+  const [codingStatus, setCodingStatus] = useState('Pending');
+  const [codingLanguage, setCodingLanguage] = useState('JavaScript');
+  const [codingChallenge, setCodingChallenge] = useState('Coding challenge');
   const [showFullTranscript, setShowFullTranscript] = useState(false);
   const [shareStatus, setShareStatus] = useState('');
 
@@ -20,6 +23,7 @@ export default function InterviewSummary() {
     const timer = window.setTimeout(() => {
       const candidateData = localStorage.getItem('candidateData');
       const interviewData = localStorage.getItem('interviewData');
+      const codingData = localStorage.getItem('codingData');
 
       if (candidateData) {
         const data = JSON.parse(candidateData);
@@ -32,6 +36,13 @@ export default function InterviewSummary() {
         setQuestionsAnswered(data.questionsAnswered || 0);
         setTotalQuestions(data.totalQuestions || 10);
         setTimeTaken(data.timeTaken || 0);
+      }
+
+      if (codingData) {
+        const data = JSON.parse(codingData);
+        setCodingStatus(data.submitted ? 'Submitted' : 'Not submitted');
+        setCodingLanguage(data.language || 'JavaScript');
+        setCodingChallenge(data.challenge || 'Coding challenge');
       }
     }, 0);
 
@@ -50,6 +61,9 @@ export default function InterviewSummary() {
       `Completion: ${questionsAnswered}/${totalQuestions}`,
       `Time taken: ${formattedTimeTaken}`,
       `Performance score: ${performanceScore}/100`,
+      `Coding challenge: ${codingStatus}`,
+      `Language: ${codingLanguage}`,
+      `Task: ${codingChallenge}`,
       '',
       'Strengths:',
       '- Clear communication and articulation',
@@ -61,7 +75,7 @@ export default function InterviewSummary() {
       '- Go deeper into technical tradeoffs',
       '- Discuss edge cases and error handling',
     ].join('\n');
-  }, [candidateName, formattedTimeTaken, performanceScore, questionsAnswered, role, totalQuestions]);
+  }, [candidateName, formattedTimeTaken, performanceScore, questionsAnswered, role, totalQuestions, codingStatus, codingLanguage, codingChallenge]);
 
   const handleDownloadReport = () => {
     const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
@@ -188,6 +202,20 @@ export default function InterviewSummary() {
               Submitted for review
             </p>
             <p className="mt-3 text-sm muted">Expected review within 24 hours.</p>
+          </div>
+        </section>
+
+        <section className="mb-6 grid gap-4 md:grid-cols-3">
+          <div className="panel p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--accent-soft)] text-[var(--accent)]">
+                <Share2 className="h-5 w-5" />
+              </span>
+              <h2 className="text-sm font-semibold text-gray-950">Coding challenge</h2>
+            </div>
+            <p className="text-lg font-semibold text-gray-950">{codingStatus}</p>
+            <p className="mt-1 text-sm muted">{codingChallenge}</p>
+            <p className="mt-3 text-sm text-gray-700">Language: {codingLanguage}</p>
           </div>
         </section>
 

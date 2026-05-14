@@ -17,7 +17,7 @@ export default function Home() {
               Practice interviews in a clean, focused workflow.
             </h1>
             <p className="max-w-xl text-lg leading-8 muted">
-              Move from candidate details to setup, interview questions, coding, and a review summary without visual noise or confusing controls.
+              Move from candidate details to setup, interview questions, a coding challenge, and a review summary without visual noise or confusing controls.
             </p>
           </div>
 
@@ -35,10 +35,15 @@ export default function Home() {
             ))}
           </div>
 
-          <Link href="/candidate-details" className="btn btn-primary w-full sm:w-auto">
-            Start Interview
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link href="/candidate-details" className="btn btn-primary w-full sm:w-auto">
+              Start Interview
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/recruiter" className="btn btn-secondary w-full sm:w-auto">
+              Recruiter dashboard
+            </Link>
+          </div>
 
           <div className="subtle-panel grid gap-4 p-4 sm:grid-cols-3" aria-label="Interview instructions">
             {[
@@ -63,7 +68,8 @@ export default function Home() {
               ['01', 'Candidate details', 'Collect role, experience, and skills.'],
               ['02', 'Setup check', 'Confirm camera, microphone, internet, and guidelines.'],
               ['03', 'Interview', 'Answer behavioral and role-based questions.'],
-              ['04', 'Summary', 'Review completion score and next actions.'],
+              ['04', 'Coding challenge', 'Solve a short programming problem.'],
+              ['05', 'Summary', 'Review completion score and next actions.'],
             ].map(([step, title, copy]) => (
               <div key={step} className="flex gap-4 px-6 py-5">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--accent-soft)] text-sm font-semibold text-[var(--accent)]">

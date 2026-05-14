@@ -1,7 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { AlertCircle, ArrowRight, Check, ChevronDown, Copy, Play } from 'lucide-react';
 import { BrandHeader } from '../components/BrandHeader';
 
@@ -39,12 +39,51 @@ export default function CodingQuestion() {
   const [output, setOutput] = useState('');
   const [codeError, setCodeError] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
+  const [savedAt, setSavedAt] = useState('');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const candidateData = localStorage.getItem('candidateData');
+      const interviewData = localStorage.getItem('interviewData');
+
+      if (!candidateData || !interviewData) {
+        router.replace(candidateData ? '/interview' : '/candidate-details');
+        return;
+      }
+
+      const savedDraft = localStorage.getItem('codingDraft');
+      if (savedDraft) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed.language) setLanguage(parsed.language);
+          if (parsed.code) setCode(parsed.code);
+          if (parsed.savedAt) setSavedAt(parsed.savedAt);
+        } catch {
+          // ignore invalid draft state
+        }
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [router]);
+
+  const saveDraft = (nextLanguage: string, nextCode: string) => {
+    const draft = {
+      language: nextLanguage,
+      code: nextCode,
+      savedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    localStorage.setItem('codingDraft', JSON.stringify(draft));
+    setSavedAt(draft.savedAt);
+  };
 
   const handleLanguageChange = (nextLanguage: string) => {
     setLanguage(nextLanguage);
-    setCode(codeSnippets[nextLanguage] || '');
+    const nextCode = codeSnippets[nextLanguage] || '';
+    setCode(nextCode);
     setCodeError('');
     setShowOutput(false);
+    saveDraft(nextLanguage, nextCode);
   };
 
   const validateCode = () => {
@@ -81,11 +120,13 @@ export default function CodingQuestion() {
   const handleSubmitCode = () => {
     if (!validateCode()) return;
 
+    saveDraft(language, code);
     localStorage.setItem(
       'codingData',
       JSON.stringify({
         language,
         submitted: true,
+        challenge: codingProblem.title,
       }),
     );
     router.replace('/interview-summary');
@@ -102,7 +143,7 @@ export default function CodingQuestion() {
               <h1 className="text-2xl font-semibold text-gray-950">{codingProblem.title}</h1>
               <p className="mt-2 leading-7 muted">{codingProblem.description}</p>
             </div>
-            <span className="rounded-full border border-[#bee5c8] bg-[var(--success-soft)] px-3 py-1 text-xs font-semibold text-[var(--success)]">
+            <span className="rounded-full border border-[var(--success)] bg-[var(--success-soft)] px-3 py-1 text-xs font-semibold text-[var(--success)]">
               {codingProblem.difficulty}
             </span>
           </div>
@@ -160,7 +201,10 @@ export default function CodingQuestion() {
 
           <div className="panel overflow-hidden">
             <div className="flex items-center justify-between border-b border-[var(--border-color)] bg-[var(--surface-soft)] px-4 py-3">
-              <span className="font-mono text-xs text-gray-600">editor.{language}</span>
+              <div>
+                <span className="font-mono text-xs text-gray-600">editor.{language}</span>
+                <p className="mt-1 text-[0.8rem] text-[var(--muted)]">Draft saved at {savedAt || 'now'}</p>
+              </div>
               <button type="button" onClick={handleCopyCode} className="btn btn-quiet min-h-9 px-3 py-2" title="Copy code">
                 {copyStatus ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 {copyStatus || 'Copy'}
@@ -170,8 +214,10 @@ export default function CodingQuestion() {
             <textarea
               value={code}
               onChange={(event) => {
-                setCode(event.target.value);
-                if (event.target.value.trim()) setCodeError('');
+                const nextCode = event.target.value;
+                setCode(nextCode);
+                if (nextCode.trim()) setCodeError('');
+                saveDraft(language, nextCode);
               }}
               className={`code-editor h-96 w-full resize-none border-0 px-4 py-4 font-mono text-sm leading-6 focus:outline-none ${codeError ? 'ring-2 ring-[var(--danger)]' : ''}`}
               spellCheck="false"
