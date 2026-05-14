@@ -88,7 +88,7 @@ export default function CodingQuestion() {
         submitted: true,
       }),
     );
-    router.push('/interview-summary');
+    router.replace('/interview-summary');
   };
 
   return (

@@ -54,6 +54,15 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button:not(:disabled),
+a[href],
+label[for],
+select,
+input[type="checkbox"],
+input[type="file"] {
+  cursor: pointer;
+}
+
 .app-shell {
   min-height: 100vh;
   background:

@@ -195,6 +195,7 @@ export default function CandidateDetails() {
               <label htmlFor="fullName" className="field-label">
                 <User className="h-4 w-4 text-[var(--accent)]" />
                 Full name
+                <span className="text-[var(--danger)]" aria-hidden="true">*</span>
               </label>
               <div className="relative">
                 <input
@@ -223,6 +224,7 @@ export default function CandidateDetails() {
               <label htmlFor="email" className="field-label">
                 <Mail className="h-4 w-4 text-[var(--accent)]" />
                 Email address
+                <span className="text-[var(--danger)]" aria-hidden="true">*</span>
               </label>
               <div className="relative">
                 <input
@@ -251,6 +253,7 @@ export default function CandidateDetails() {
               <label htmlFor="roleAppliedFor" className="field-label">
                 <Briefcase className="h-4 w-4 text-[var(--accent)]" />
                 Role applied for
+                <span className="text-[var(--danger)]" aria-hidden="true">*</span>
               </label>
               <div className="relative">
                 <select
@@ -281,7 +284,10 @@ export default function CandidateDetails() {
             </div>
 
             <div>
-              <label htmlFor="experienceLevel" className="field-label">Experience level</label>
+              <label htmlFor="experienceLevel" className="field-label">
+                Experience level
+                <span className="text-[var(--danger)]" aria-hidden="true">*</span>
+              </label>
               <div className="relative">
                 <select
                   id="experienceLevel"
@@ -314,6 +320,7 @@ export default function CandidateDetails() {
               <label htmlFor="skills" className="field-label">
                 <Zap className="h-4 w-4 text-[var(--accent)]" />
                 Skills and technologies
+                <span className="text-[var(--danger)]" aria-hidden="true">*</span>
               </label>
               <textarea
                 id="skills"

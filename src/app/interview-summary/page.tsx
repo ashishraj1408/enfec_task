@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Award, CheckCircle2, Clock, Download, Home, Share2, TrendingUp } from 'lucide-react';
 import { BrandHeader } from '../components/BrandHeader';
 
 export default function InterviewSummary() {
+  const router = useRouter();
   const [candidateName, setCandidateName] = useState('Candidate');
   const [role, setRole] = useState('Role not specified');
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
@@ -86,6 +88,30 @@ export default function InterviewSummary() {
     window.setTimeout(() => setShareStatus(''), 1600);
   };
 
+  const clearInterviewSession = useCallback(() => {
+    [
+      'candidateData',
+      'candidateDraft',
+      'interviewSetupComplete',
+      'deviceCheckBypassed',
+      'interviewData',
+      'codingData',
+    ].forEach((key) => localStorage.removeItem(key));
+  }, []);
+
+  useEffect(() => {
+    window.history.pushState({ completedInterview: true }, '', window.location.href);
+
+    const handleBackNavigation = () => {
+      clearInterviewSession();
+      router.replace('/');
+    };
+
+    window.addEventListener('popstate', handleBackNavigation);
+
+    return () => window.removeEventListener('popstate', handleBackNavigation);
+  }, [clearInterviewSession, router]);
+
   const strengths = [
     'Clear communication and articulation',
     'Strong problem-solving approach',
@@ -122,7 +148,7 @@ export default function InterviewSummary() {
               </span>
               <h2 className="text-sm font-semibold text-gray-950">Completion</h2>
             </div>
-            <p className="text-4xl font-semibold text-gray-950">{completionPercentage}%</p>
+            <p className="text-2xl font-semibold text-gray-950">{completionPercentage}%</p>
             <p className="mt-1 text-sm muted">{questionsAnswered}/{totalQuestions} questions answered</p>
             <div className="mt-4 h-2 rounded-full bg-[var(--surface-soft)]">
               <div className="h-2 rounded-full bg-[var(--accent)]" style={{ width: `${completionPercentage}%` }} />
@@ -147,7 +173,7 @@ export default function InterviewSummary() {
               </span>
               <h2 className="text-sm font-semibold text-gray-950">Performance</h2>
             </div>
-            <p className="text-4xl font-semibold text-gray-950">{performanceScore}/100</p>
+            <p className="text-2xl font-semibold text-gray-950">{performanceScore}/100</p>
             <p className="mt-1 text-sm muted">Overall simulated evaluation</p>
           </div>
 
@@ -158,7 +184,7 @@ export default function InterviewSummary() {
               </span>
               <h2 className="text-sm font-semibold text-gray-950">Status</h2>
             </div>
-            <p className="rounded-lg border border-[#bee5c8] bg-[var(--success-soft)] px-3 py-2 text-sm font-semibold text-[var(--success)]">
+            <p className="rounded-lg border border-[#bee5c8] bg-[var(--success-soft)] px-2 py-2 text-sm font-semibold text-[var(--success)]">
               Submitted for review
             </p>
             <p className="mt-3 text-sm muted">Expected review within 24 hours.</p>
@@ -223,7 +249,7 @@ export default function InterviewSummary() {
         </section>
 
         <section className="grid gap-3 md:grid-cols-3">
-          <Link href="/" className="btn btn-secondary">
+          <Link href="/" onClick={clearInterviewSession} className="btn btn-secondary">
             <Home className="h-4 w-4" />
             Back to Home
           </Link>

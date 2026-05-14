@@ -102,7 +102,7 @@ export default function Interview() {
     }
 
     saveInterviewData(answeredCount, nextElapsed);
-    router.push('/interview-summary');
+    router.replace('/interview-summary');
   };
 
   const handleStartAnswer = () => {
@@ -135,7 +135,7 @@ export default function Interview() {
 
   const handleEndInterview = () => {
     saveInterviewData(answeredQuestions.length, totalElapsed + timer);
-    router.push('/interview-summary');
+    router.replace('/interview-summary');
   };
 
   const handleRecordingToggle = () => {

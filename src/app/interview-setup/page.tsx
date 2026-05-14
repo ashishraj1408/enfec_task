@@ -11,6 +11,7 @@ type DeviceStatus = 'checking' | 'ready' | 'blocked' | 'unsupported';
 export default function InterviewSetup() {
   const router = useRouter();
   const [accessReady, setAccessReady] = useState(false);
+  const [deviceBypassEnabled, setDeviceBypassEnabled] = useState(false);
   const [checks, setChecks] = useState({
     camera: 'checking' as DeviceStatus,
     microphone: 'checking' as DeviceStatus,
@@ -77,13 +78,14 @@ export default function InterviewSetup() {
     return () => window.clearTimeout(timer);
   }, [accessReady, checkMediaPermissions]);
 
-  const devicesReady = checks.camera === 'ready' && checks.microphone === 'ready';
+  const devicesReady = deviceBypassEnabled || (checks.camera === 'ready' && checks.microphone === 'ready');
   const allChecksPassed = devicesReady && checks.internet && checks.guidelines;
 
   const handleStartInterview = () => {
     setAttemptedStart(true);
     if (allChecksPassed) {
       localStorage.setItem('interviewSetupComplete', 'true');
+      localStorage.setItem('deviceCheckBypassed', deviceBypassEnabled ? 'true' : 'false');
       router.push('/interview');
     }
   };
@@ -96,6 +98,7 @@ export default function InterviewSetup() {
 
   const statusText = (status: boolean | DeviceStatus, fallback: string) => {
     if (status === true || status === 'ready') return 'Ready';
+    if (deviceBypassEnabled && (status === 'blocked' || status === 'unsupported')) return 'Bypassed for testing';
     if (status === false) return fallback;
     if (status === 'checking') return 'Waiting for browser permission...';
     if (status === 'unsupported') return 'This browser does not support device permission checks.';
@@ -155,10 +158,32 @@ export default function InterviewSetup() {
           </div>
 
           {!devicesReady && (
-            <button type="button" onClick={checkMediaPermissions} className="btn btn-secondary mt-4 w-full">
-              <RefreshCw className="h-4 w-4" />
-              Retry Camera and Microphone Permission
-            </button>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <button type="button" onClick={checkMediaPermissions} className="btn btn-secondary w-full">
+                <RefreshCw className="h-4 w-4" />
+                Retry Permission
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDeviceBypassEnabled(true);
+                  setChecks((currentChecks) => ({
+                    ...currentChecks,
+                    camera: currentChecks.camera === 'ready' ? 'ready' : 'blocked',
+                    microphone: currentChecks.microphone === 'ready' ? 'ready' : 'blocked',
+                  }));
+                }}
+                className="btn btn-secondary w-full"
+              >
+                Continue Without Devices
+              </button>
+            </div>
+          )}
+
+          {deviceBypassEnabled && (
+            <div className="mt-4 rounded-lg border border-[#f4d08a] bg-[var(--warning-soft)] p-4 text-sm font-medium text-[var(--warning)]">
+              Camera and microphone checks are bypassed temporarily for local testing.
+            </div>
           )}
 
           <div className="mt-7 border-t border-[var(--border-color)] pt-6">
