@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Award, Briefcase, CheckCircle2, ClipboardList, Users } from 'lucide-react';
+import { ArrowLeft, Award, Briefcase, CheckCircle2, ClipboardList, Users } from 'lucide-react';
 import { BrandHeader } from '../components/BrandHeader';
 
 const candidateSamples = [
@@ -78,7 +78,7 @@ export default function RecruiterDashboard() {
               <p className="mt-2 muted">Quickly review candidate progress and surface the strongest performers.</p>
             </div>
             <Link href="/" className="btn btn-secondary">
-              Back to Home
+              <ArrowLeft/> Back to Home
             </Link>
           </div>
 
